@@ -1,4 +1,5 @@
 {
+  "homepage": "https://duzos.github.io/traintrack",
   "name": "traintrack",
   "version": "0.1.0",
   "private": true,
@@ -8,20 +9,29 @@
     "@testing-library/react": "^16.3.0",
     "@testing-library/user-event": "^13.5.0",
     "@types/jest": "^27.5.2",
+    "@types/leaflet": "^1.9.20",
     "@types/node": "^16.18.126",
     "@types/react": "^19.1.12",
     "@types/react-dom": "^19.1.9",
+    "@types/xml2js": "^0.4.14",
+    "axios": "^1.11.0",
+    "gh-pages": "^6.3.0",
+    "leaflet": "^1.9.4",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
+    "react-leaflet": "^5.0.0",
     "react-scripts": "5.0.1",
     "typescript": "^4.9.5",
-    "web-vitals": "^2.1.4"
+    "web-vitals": "^2.1.4",
+    "xml2js": "^0.6.2"
   },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build"
   },
   "eslintConfig": {
     "extends": [

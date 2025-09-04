@@ -1,38 +1,184 @@
+/* App.css */
+
+/* Global reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body, #root {
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+}
+
+/* Main app container */
 .App {
-  text-align: center;
+  height: 100vh;
+  width: 100vw;
+  position: relative;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+/* Leaflet map styling */
+.leaflet-container {
+  height: 100vh !important;
+  width: 100vw !important;
+  z-index: 1;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
+/* Fix for Leaflet zoom controls */
+.leaflet-control-zoom {
+  position: absolute !important;
+  top: 10px !important;
+  right: 10px !important;
+  z-index: 1000 !important;
+}
+
+/* Train marker custom styling */
+.train-marker {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+/* Panel positioning and styling */
+.stats-panel {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  background: white;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  min-width: 200px;
+  border: 1px solid #e5e7eb;
+}
+
+.train-info-panel {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: white;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  min-width: 250px;
+  border: 1px solid #e5e7eb;
+}
+
+.legend-panel {
+  position: absolute;
+  bottom: 1rem;
+  left: 1rem;
+  background: white;
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  border: 1px solid #e5e7eb;
+}
+
+.controls-info {
+  position: absolute;
+  bottom: 1rem;
+  right: 1rem;
+  background: white;
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  border: 1px solid #e5e7eb;
+  font-size: 0.75rem;
+  color: #6b7280;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .stats-panel,
+  .train-info-panel {
+    position: fixed;
+    max-width: calc(100vw - 2rem);
+  }
+  
+  .stats-panel {
+    top: 0.5rem;
+    left: 0.5rem;
+  }
+  
+  .train-info-panel {
+    top: 0.5rem;
+    right: 0.5rem;
+  }
+  
+  .legend-panel,
+  .controls-info {
+    bottom: 0.5rem;
+    font-size: 0.625rem;
+  }
+  
+  .legend-panel {
+    left: 0.5rem;
+  }
+  
+  .controls-info {
+    right: 0.5rem;
   }
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+/* Loading spinner */
+.loading-spinner {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 2000;
 }
 
-.App-link {
-  color: #61dafb;
+/* Button styles */
+button {
+  cursor: pointer;
+  transition: all 0.2s ease;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+button:hover {
+  opacity: 0.8;
 }
+
+/* Status colors */
+.status-green { color: #059669; }
+.status-red { color: #dc2626; }
+.status-yellow { color: #d97706; }
+.status-blue { color: #2563eb; }
+.status-orange { color: #ea580c; }
+.status-gray { color: #6b7280; }
+
+/* Train rectangle styles for legend */
+.train-legend-box {
+  width: 16px;
+  height: 8px;
+  border-radius: 2px;
+  border: 1px solid;
+}
+
+.train-legend-moving {
+  background-color: #2563eb;
+  border-color: #1e40af;
+}
+
+.train-legend-stopped {
+  background-color: #dc2626;
+  border-color: #b91c1c;
+}
+
+/* Track line styles for legend */
+.track-legend-line {
+  height: 2px;
+  width: 16px;
+  border-radius: 1px;
+}
+
+.track-main { background-color: #4a5568; }
+.track-branch { background-color: #718096; }
