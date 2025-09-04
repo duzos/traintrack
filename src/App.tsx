@@ -323,7 +323,7 @@ const TrainInfoPanel: React.FC<{
         
         <div style={{ display: 'flex', justifyContent: 'space-between' }}>
           <span style={{ color: '#6b7280' }}>Speed:</span>
-          <span style={{ fontWeight: '500' }}>{selectedTrain.speed} mph</span>
+          <span style={{ fontWeight: '500' }}>{Math.round(selectedTrain.speed)} mph</span>
         </div>
         
         <div style={{ display: 'flex', justifyContent: 'space-between' }}>
@@ -338,7 +338,7 @@ const TrainInfoPanel: React.FC<{
             }
             style={{ fontWeight: '500' }}
           >
-            {selectedTrain.delay === 0 ? 'On time' : `${selectedTrain.delay} min late`}
+            {selectedTrain.delay === 0 ? 'On time' : `${Math.round(selectedTrain.delay)} min late`}
           </span>
         </div>
         
