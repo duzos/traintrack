@@ -81,6 +81,18 @@ html, body, #root {
   border: 1px solid #e5e7eb;
 }
 
+.style-panel {
+  position: absolute;
+  bottom: 1rem;
+  left: 10rem;
+  background: white;
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  border: 1px solid #e5e7eb;
+}
+
 .controls-info {
   position: absolute;
   bottom: 1rem;
@@ -114,7 +126,7 @@ html, body, #root {
   }
   
   .legend-panel,
-  .controls-info {
+  .controls-info, .style-panel {
     bottom: 0.5rem;
     font-size: 0.625rem;
   }
@@ -182,3 +194,7 @@ button:hover {
 
 .track-main { background-color: #4a5568; }
 .track-branch { background-color: #718096; }
+
+.greyscale {
+  filter: grayscale(100%) brightness(90%);
+}

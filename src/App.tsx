@@ -397,12 +397,79 @@ const Legend: React.FC<{ lastUpdate: Date }> = ({ lastUpdate }) => {
   );
 };
 
+// Styles
+enum MapStyle {
+  Standard = 'standard',
+  Signals = 'signals',
+  Maxspeed = 'maxspeed',
+  Electrification = 'electrification',
+}
+
+const StyleSelectButton: React.FC<{
+  style: MapStyle;
+  current: MapStyle;
+  setCurrentStyle: (style: MapStyle) => void;
+}> = ({ style, current, setCurrentStyle }) => {
+  const isSelected = current === style;
+  const colors = {
+    [MapStyle.Standard]: { border: '#2563eb', background: '#2563eb', color: '#fff' },
+    [MapStyle.Signals]: { border: '#059669', background: '#059669', color: '#fff' },
+    [MapStyle.Maxspeed]: { border: '#f59e42', background: '#f59e42', color: '#fff' },
+    [MapStyle.Electrification]: { border: '#a855f7', background: '#a855f7', color: '#fff' },
+  };
+
+  return (
+    <button
+      className={`style-select-btn${isSelected ? ' selected' : ''}`}
+      style={{
+        padding: '0.25rem 0.75rem',
+        borderRadius: '4px',
+        border: isSelected ? `2px solid ${colors[style].border}` : '1px solid #d1d5db',
+        background: isSelected ? colors[style].background : '#f3f4f6',
+        color: isSelected ? colors[style].color : '#1f2937',
+        fontWeight: 500,
+        cursor: 'pointer',
+        transition: 'all 0.15s'
+      }}
+      disabled={isSelected}
+      title={`${style.charAt(0).toUpperCase() + style.slice(1)} railway map`}
+      onClick={() => setCurrentStyle(style)}
+    >
+      {style.charAt(0).toUpperCase() + style.slice(1)}
+    </button>
+  );
+} 
+
+const StyleSelect: React.FC<{ current: MapStyle, setCurrentStyle: (style: MapStyle) => void }> = ({ current, setCurrentStyle }) => {
+  return (
+    <div className="style-panel">
+      <h4 style={{ fontWeight: '600', fontSize: '0.875rem', marginBottom: '0.5rem' }}>Styles</h4>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', fontSize: '0.75rem' }}>
+      <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.5rem' }}>
+        {Object.values(MapStyle).map(style => (
+          <StyleSelectButton
+        key={style}
+        style={style as MapStyle}
+        current={current}
+        setCurrentStyle={setCurrentStyle}
+          />
+        ))}
+      </div>
+      <div style={{ fontSize: '0.75rem', color: '#6b7280' }}>
+        Select a map style to highlight different railway features.
+      </div>
+      </div>
+    </div>
+  );
+};
+
 // Main App Component
 const App: React.FC = () => {
   const [trains, setTrains] = useState<TrainPosition[]>(mockTrainData);
   const [tracks] = useState<RailwayTrack[]>(mockRailwayTracks);
   const [selectedTrain, setSelectedTrain] = useState<TrainPosition | null>(null);
   const [lastUpdate, setLastUpdate] = useState<Date>(new Date());
+  const [currentStyle, setCurrentStyle] = useState<MapStyle>(MapStyle.Standard);
 
   // Simulate real-time updates
   useEffect(() => {
@@ -437,9 +504,15 @@ const App: React.FC = () => {
       >
         <TileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          attribution='© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+          attribution='&copy; OpenStreetMap contributors'
+          className='greyscale'
         />
-        
+        <TileLayer
+          url={`https://{s}.tiles.openrailwaymap.org/${currentStyle.toLowerCase()}/{z}/{x}/{y}.png`}
+          subdomains={['a','b','c']}
+          attribution='&copy; OpenRailwayMap'
+        />
+
         {tracks.map(track => (
           <RailwayTrack key={track.id} track={track} />
         ))}
@@ -460,6 +533,7 @@ const App: React.FC = () => {
         onClose={() => setSelectedTrain(null)}
       />
 
+      <StyleSelect current={currentStyle} setCurrentStyle={setCurrentStyle} />
       <Legend lastUpdate={lastUpdate} />
 
       <div className="controls-info">
