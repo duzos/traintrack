@@ -365,6 +365,26 @@ const StyleSelect: React.FC<{ current: MapStyle, setCurrentStyle: (style: MapSty
   );
 };
 
+const TrainLayer: React.FC<{ trains: TrainPosition[], onTrainClick: (train: TrainPosition) => void }> = ({ trains, onTrainClick }) => {
+  const [updateKey, setUpdateKey] = useState(0);
+  
+  useEffect(() => {
+    setUpdateKey(prev => prev + 1);
+  }, [trains]);
+  
+  return (
+    <>
+      {trains.map(train => (
+        <TrainIcon
+          key={`${train.id}-${updateKey}`}
+          position={train}
+          onTrainClick={onTrainClick}
+        />
+      ))}
+    </>
+  );
+};
+
 // Main App Component
 const App: React.FC = () => {
   const [trains, setTrains] = useState<TrainPosition[]>([]);
@@ -372,40 +392,30 @@ const App: React.FC = () => {
   const [selectedTrain, setSelectedTrain] = useState<TrainPosition | null>(null);
   const [lastUpdate, setLastUpdate] = useState<Date>(new Date());
   const [currentStyle, setCurrentStyle] = useState<MapStyle>(MapStyle.Standard);
+  const [updateKey, setUpdateKey] = useState(0);
 
-    useEffect(() => {
-      const loadData = async () => {
-        try {
-          const data = await getTrainPositions();
-          console.log('SignalBox data:', data);
-          setTrains(data);
-        } catch (error) {
-          console.error('Failed to fetch data:', error);
-        }
-      };
-
-      loadData();
-    }, []); // Empty dependency array means this runs once on component mount
-
-
-  // Simulate real-time updates
   useEffect(() => {
-    const interval = setInterval(() => {
-      setTrains(prevTrains => 
-        prevTrains.map(train => ({
-          ...train,
-          lat: train.lat + (Math.random() - 0.5) * 0.002 * (train.speed / 100),
-          lng: train.lng + (Math.random() - 0.5) * 0.002 * (train.speed / 100),
-          speed: Math.max(0, Math.min(125, train.speed + (Math.random() - 0.5) * 15)),
-          delay: Math.max(0, Math.min(30, train.delay + (Math.random() - 0.5) * 3)),
-          heading: (train.heading + (Math.random() - 0.5) * 10 + 360) % 360
-        }))
-      );
-      setLastUpdate(new Date());
-    }, 3000);
+    const loadData = async () => {
+      try {
+        const data = await getTrainPositions();
+        console.log('SignalBox data:', data);
+        setTrains(data);
+        setUpdateKey(prev => prev + 1); // This forces complete re-render
+        setLastUpdate(new Date()); // Update the timestamp
+      } catch (error) {
+        console.error('Failed to fetch data:', error);
+      }
+    };
 
+    // Load data immediately
+    loadData();
+
+    // Set up interval to load data every 10 seconds
+    const interval = setInterval(loadData, 10000); // 10000ms = 10 seconds
+
+    // Cleanup function to clear interval when component unmounts
     return () => clearInterval(interval);
-  }, []);
+  }, []); // Empty dependency array
 
   const handleTrainClick = (train: TrainPosition) => {
     setSelectedTrain(train);
@@ -434,13 +444,7 @@ const App: React.FC = () => {
           <RailwayTrack key={track.id} track={track} />
         ))}
         
-        {trains.map(train => (
-          <TrainIcon 
-            key={train.id} 
-            position={train} 
-            onTrainClick={handleTrainClick}
-          />
-        ))}
+        <TrainLayer trains={trains} onTrainClick={handleTrainClick} />
       </MapContainer>
 
       <StatisticsPanel trains={trains} />
