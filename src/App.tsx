@@ -4,10 +4,13 @@ import { MapContainer, TileLayer, Polyline, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import './App.css';
 
+import './services/signalbox.ts'; 
+
 // Fix for default Leaflet marker icons
 import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
 import markerIcon from 'leaflet/dist/images/marker-icon.png';
 import markerShadow from 'leaflet/dist/images/marker-shadow.png';
+import { fetchData, getTrainPositions } from './services/signalbox';
 
 // Fix Leaflet default icon issue
 delete (L.Icon.Default.prototype as any)._getIconUrl;
@@ -18,7 +21,7 @@ L.Icon.Default.mergeOptions({
 });
 
 // Types
-interface TrainPosition {
+export interface TrainPosition {
   id: string;
   lat: number;
   lng: number;
@@ -30,113 +33,12 @@ interface TrainPosition {
   delay: number;
 }
 
+
 interface RailwayTrack {
   id: string;
   coordinates: [number, number][];
   type: 'main' | 'branch' | 'siding';
 }
-
-// Mock data
-const mockTrainData: TrainPosition[] = [
-  {
-    id: 'train_001',
-    lat: 51.5074,
-    lng: -0.1278,
-    heading: 45,
-    speed: 85,
-    service: '1A23',
-    operator: 'LNER',
-    destination: 'Edinburgh',
-    delay: 2
-  },
-  {
-    id: 'train_002',
-    lat: 51.4545,
-    lng: -2.5879,
-    heading: 180,
-    speed: 95,
-    service: '1C45',
-    operator: 'GWR',
-    destination: 'Bristol',
-    delay: 0
-  },
-  {
-    id: 'train_003',
-    lat: 53.4808,
-    lng: -2.2426,
-    heading: 270,
-    speed: 78,
-    service: '1M67',
-    operator: 'Northern',
-    destination: 'Liverpool',
-    delay: 5
-  },
-  {
-    id: 'train_004',
-    lat: 51.5155,
-    lng: -0.0922,
-    heading: 90,
-    speed: 0,
-    service: '2B89',
-    operator: 'TfL Rail',
-    destination: 'Stratford',
-    delay: 12
-  },
-  {
-    id: 'train_005',
-    lat: 52.2053,
-    lng: 0.1218,
-    heading: 135,
-    speed: 72,
-    service: '1P34',
-    operator: 'Greater Anglia',
-    destination: 'Norwich',
-    delay: 1
-  }
-];
-
-const mockRailwayTracks: RailwayTrack[] = [
-  {
-    id: 'track_001',
-    coordinates: [
-      [51.5074, -0.1278],
-      [51.5155, -0.0922],
-      [51.5234, -0.0586],
-      [51.5312, -0.0250]
-    ],
-    type: 'main'
-  },
-  {
-    id: 'track_002',
-    coordinates: [
-      [51.4545, -2.5879],
-      [51.4612, -2.5234],
-      [51.4698, -2.4587],
-      [51.4785, -2.3940]
-    ],
-    type: 'main'
-  },
-  {
-    id: 'track_003',
-    coordinates: [
-      [53.4808, -2.2426],
-      [53.4756, -2.3012],
-      [53.4701, -2.3598],
-      [53.4645, -2.4184]
-    ],
-    type: 'main'
-  },
-  {
-    id: 'track_004',
-    coordinates: [
-      [52.2053, 0.1218],
-      [52.1987, 0.1456],
-      [52.1921, 0.1694],
-      [52.1855, 0.1932]
-    ],
-    type: 'branch'
-  }
-];
 
 // Train Icon Component
 const TrainIcon: React.FC<{
@@ -465,11 +367,26 @@ const StyleSelect: React.FC<{ current: MapStyle, setCurrentStyle: (style: MapSty
 
 // Main App Component
 const App: React.FC = () => {
-  const [trains, setTrains] = useState<TrainPosition[]>(mockTrainData);
-  const [tracks] = useState<RailwayTrack[]>(mockRailwayTracks);
+  const [trains, setTrains] = useState<TrainPosition[]>([]);
+  const [tracks] = useState<RailwayTrack[]>([]);
   const [selectedTrain, setSelectedTrain] = useState<TrainPosition | null>(null);
   const [lastUpdate, setLastUpdate] = useState<Date>(new Date());
   const [currentStyle, setCurrentStyle] = useState<MapStyle>(MapStyle.Standard);
+
+    useEffect(() => {
+      const loadData = async () => {
+        try {
+          const data = await getTrainPositions();
+          console.log('SignalBox data:', data);
+          setTrains(data);
+        } catch (error) {
+          console.error('Failed to fetch data:', error);
+        }
+      };
+
+      loadData();
+    }, []); // Empty dependency array means this runs once on component mount
+
 
   // Simulate real-time updates
   useEffect(() => {
